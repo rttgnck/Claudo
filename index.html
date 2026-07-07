@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Claudo — a particle life studio</title>
+  <meta name="description" content="Thousands of particles, one simple rule, endless emergent life. Tune the universe, discover behaviors, and share the worlds you find." />
+  <meta name="theme-color" content="#07070c" />
+
+  <!-- Open Graph / social -->
+  <meta property="og:title" content="Claudo — a particle life studio" />
+  <meta property="og:description" content="Simple rules, emergent life. Tune your own universe of particles and share what you discover." />
+  <meta property="og:type" content="website" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='11' cy='13' r='5' fill='%23ff5c7c'/><circle cx='21' cy='19' r='5' fill='%2338bdf8'/><circle cx='19' cy='9' r='4' fill='%234ade80'/></svg>" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <canvas id="stage"></canvas>
+
+  <!-- Top bar -->
+  <header id="topbar">
+    <div id="logo" class="logo">
+      <span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span>
+      <span class="word">Claudo</span>
+    </div>
+    <div class="actions">
+      <select id="presetSelect" title="Load a curated universe">
+        <option value="" disabled selected>Presets…</option>
+      </select>
+      <button id="playBtn" class="btn">❚❚ Pause</button>
+      <button id="randomBtn" class="btn" title="Roll a brand-new random universe">⚄ Randomize</button>
+      <button id="restartBtn" class="btn ghost" title="Re-scatter particles">↻ Reset</button>
+      <button id="cursorBtn" class="btn ghost" title="Toggle cursor force">✦ Attract</button>
+      <button id="shareBtn" class="btn primary" title="Copy a link to this exact universe">⇪ Share</button>
+      <button id="saveBtn" class="btn ghost" title="Save a PNG snapshot">⇩ PNG</button>
+      <button id="panelToggle" class="btn ghost only-narrow" title="Toggle controls">⚙</button>
+    </div>
+  </header>
+
+  <!-- Control panel -->
+  <aside id="panel">
+    <button id="panelClose" class="panel-close only-narrow" onclick="document.body.classList.remove('panel-open')">✕</button>
+
+    <section class="group">
+      <h3>Interaction matrix</h3>
+      <p class="tip">Drag a cell up/down. <b>Green</b> = the row color chases the column color, <b>red</b> = flees it.</p>
+      <div id="matrix"></div>
+    </section>
+
+    <section class="group">
+      <h3>World</h3>
+      <label class="ctl"><span>Particles</span><input id="countRange" type="range" min="500" max="6000" step="100" value="2400" /><output id="countVal">2400</output></label>
+      <label class="ctl"><span>Colors</span><input id="colorsRange" type="range" min="2" max="9" step="1" value="6" /><output id="colorsVal">6</output></label>
+      <label class="ctl"><span>Radius</span><input id="rmaxRange" type="range" min="0.03" max="0.2" step="0.005" value="0.11" /><output id="rmaxVal">0.110</output></label>
+      <label class="ctl"><span>Repulsion</span><input id="betaRange" type="range" min="0.1" max="0.5" step="0.01" value="0.3" /><output id="betaVal">0.30</output></label>
+      <label class="ctl"><span>Force</span><input id="forceRange" type="range" min="0.5" max="10" step="0.1" value="4.2" /><output id="forceVal">4.2</output></label>
+      <label class="ctl"><span>Momentum</span><input id="frictionRange" type="range" min="0.6" max="0.98" step="0.01" value="0.86" /><output id="frictionVal">0.86</output></label>
+    </section>
+
+    <section class="group">
+      <h3>Look</h3>
+      <label class="ctl"><span>Glow</span><input id="glowRange" type="range" min="0" max="1" step="0.05" value="0.55" /><output id="glowVal">0.55</output></label>
+      <label class="ctl"><span>Size</span><input id="sizeRange" type="range" min="0.8" max="5" step="0.1" value="2.0" /><output id="sizeVal">2.0</output></label>
+      <label class="ctl"><span>Trails</span><input id="trailsRange" type="range" min="0" max="0.98" step="0.02" value="0.82" /><output id="trailsVal">0.82</output></label>
+    </section>
+
+    <footer class="panel-foot">
+      <span id="fps">— fps</span>
+      <a href="https://en.wikipedia.org/wiki/Artificial_life" target="_blank" rel="noopener">what is this?</a>
+    </footer>
+  </aside>
+
+  <!-- First-run hint -->
+  <div id="hint">
+    <div class="hint-inner">
+      <strong>These particles are alive-ish.</strong>
+      Each color attracts or repels every other color by a rule you control.
+      <span>Click &amp; drag the canvas to stir · Randomize for a new world · Share what you find.</span>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
