@@ -24,6 +24,7 @@
       <span class="word">Claudo</span>
     </div>
     <div class="actions">
+      <button id="mode3dBtn" class="btn" title="Switch between 2D and 3D">⬗ 3D</button>
       <button id="playBtn" class="btn">❚❚ Pause</button>
       <button id="randomBtn" class="btn" title="Roll new attractor parameters">⚄ Randomize</button>
       <button id="restartBtn" class="btn ghost" title="Re-develop the exposure">↻ Reset</button>
@@ -40,10 +41,13 @@
       <h3>Attractor</h3>
       <p class="tip">A chaotic map iterated millions of times. Each of the four numbers reshapes the whole structure — nudge them slowly.</p>
       <label class="ctl"><span>Family</span><select id="familySelect" class="inline-select"></select><output></output></label>
-      <label class="ctl"><span>a</span><input id="pA" type="range" min="-2" max="2" step="0.005" /><output id="pAV">0</output></label>
-      <label class="ctl"><span>b</span><input id="pB" type="range" min="-2" max="2" step="0.005" /><output id="pBV">0</output></label>
-      <label class="ctl"><span>c</span><input id="pC" type="range" min="-2" max="2" step="0.005" /><output id="pCV">0</output></label>
-      <label class="ctl"><span>d</span><input id="pD" type="range" min="-2" max="2" step="0.005" /><output id="pDV">0</output></label>
+      <div id="params2d">
+        <label class="ctl"><span>a</span><input id="pA" type="range" min="-2" max="2" step="0.005" /><output id="pAV">0</output></label>
+        <label class="ctl"><span>b</span><input id="pB" type="range" min="-2" max="2" step="0.005" /><output id="pBV">0</output></label>
+        <label class="ctl"><span>c</span><input id="pC" type="range" min="-2" max="2" step="0.005" /><output id="pCV">0</output></label>
+        <label class="ctl"><span>d</span><input id="pD" type="range" min="-2" max="2" step="0.005" /><output id="pDV">0</output></label>
+      </div>
+      <p class="tip mode3d-only" style="display:none">Drag to orbit · scroll or pinch to zoom · pick a system above.</p>
     </section>
 
     <section class="group">

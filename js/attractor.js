@@ -3,6 +3,7 @@
 // often each pixel is visited into a density buffer, and colour it by
 // log-density. The picture "develops" over successive frames.
 import { initNav } from './nav.js';
+import { Attractor3D, ATTRACTOR3D } from './attractor3d.js';
 
 const $ = (id) => document.getElementById(id);
 const canvas = $('stage');
@@ -72,6 +73,7 @@ const state = {
 
 let W, H, density, maxD, x, y, span, cx, cy, scale, imgData, buf32;
 const dpr = Math.min(window.devicePixelRatio || 1, 1.6);
+const view = { zoom: 1, ox: 0, oy: 0 }; // 2D pan/zoom (screen-space offset in device px)
 
 function setup() {
   const rect = canvas.getBoundingClientRect();
@@ -111,8 +113,8 @@ function iterate() {
   for (let i = 0; i < n; i++) {
     const nx = stepFn(lx, ly, p);
     lx = nx[0]; ly = nx[1];
-    const px = ((lx * scale) + cx) | 0;
-    const py = ((ly * scale) + cy) | 0;
+    const px = ((lx * scale * view.zoom) + cx + view.ox) | 0;
+    const py = ((ly * scale * view.zoom) + cy + view.oy) | 0;
     if (px >= 0 && px < W && py >= 0 && py < H) {
       const idx = py * W + px;
       const v = ++density[idx];
@@ -140,15 +142,23 @@ function paint() {
 }
 
 let running = true;
-function loop() {
-  if (running) iterate();
-  paint();
+let mode3d = false;
+let attr3d = null;
+let lastT = performance.now();
+function loop(now) {
+  const dt = Math.min((now - lastT) / 1000, 0.05); lastT = now;
+  if (mode3d) {
+    if (attr3d && attr3d.ready) { if (running) attr3d.step(); attr3d.render(dt); }
+  } else {
+    if (running) iterate();
+    paint();
+  }
   updateStatus();
   requestAnimationFrame(loop);
 }
 
 function updateStatus() {
-  const samples = frames * state.rate;
+  const samples = mode3d ? (attr3d ? attr3d.pointCount : 0) : frames * state.rate;
   $('samples').textContent = samples > 1e6 ? (samples / 1e6).toFixed(1) + 'M pts' : Math.round(samples / 1000) + 'k pts';
 }
 
@@ -180,12 +190,86 @@ function bindControls() {
       reset();
     });
   }
-  $('familySelect').addEventListener('change', () => { state.family = $('familySelect').value; reset(); });
-  $('paletteSelect').addEventListener('change', () => { state.palette = $('paletteSelect').value; });
+  $('familySelect').addEventListener('change', () => {
+    const v = $('familySelect').value;
+    if (mode3d) { attr3d.setFamily(v); }
+    else { state.family = v; reset(); }
+  });
+  $('paletteSelect').addEventListener('change', () => {
+    state.palette = $('paletteSelect').value;
+    if (mode3d && attr3d) attr3d.setPaletteLUT(PALETTES[state.palette]);
+  });
   $('rateRange').addEventListener('input', () => {
     state.rate = parseInt($('rateRange').value);
     $('rateVal').textContent = Math.round(state.rate / 1000) + 'k';
   });
+}
+
+// Populate the family dropdown with either the 2D maps or the 3D systems.
+function populateFamilies(is3d) {
+  const fam = $('familySelect');
+  fam.innerHTML = '';
+  const entries = is3d ? Object.entries(ATTRACTOR3D) : Object.entries(FAMILIES).map(([k, v]) => [k, v.name]);
+  for (const [k, name] of entries) {
+    const o = document.createElement('option'); o.value = k; o.textContent = name; fam.appendChild(o);
+  }
+  fam.value = is3d ? 'lorenz' : state.family;
+}
+
+// 2D pan/zoom on the density plot (re-accumulates on change).
+function bindZoom2D() {
+  canvas.addEventListener('wheel', (e) => {
+    if (mode3d) return;
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) * (W / rect.width);
+    const my = (e.clientY - rect.top) * (H / rect.height);
+    // world point under the cursor stays fixed across the zoom
+    const wx = (mx - cx - view.ox) / (scale * view.zoom);
+    const wy = (my - cy - view.oy) / (scale * view.zoom);
+    view.zoom = Math.max(0.3, Math.min(60, view.zoom * Math.exp(-e.deltaY * 0.0015)));
+    view.ox = mx - cx - wx * scale * view.zoom;
+    view.oy = my - cy - wy * scale * view.zoom;
+    reset();
+  }, { passive: false });
+
+  let drag = null;
+  canvas.addEventListener('mousedown', (e) => { if (!mode3d) drag = { x: e.clientX, y: e.clientY }; });
+  window.addEventListener('mousemove', (e) => {
+    if (!drag || mode3d) return;
+    const rect = canvas.getBoundingClientRect();
+    view.ox += (e.clientX - drag.x) * (W / rect.width);
+    view.oy += (e.clientY - drag.y) * (H / rect.height);
+    drag = { x: e.clientX, y: e.clientY };
+    reset();
+  });
+  window.addEventListener('mouseup', () => { drag = null; });
+}
+
+// 2D <-> 3D toggle.
+async function toggle3D() {
+  const btn = $('mode3dBtn');
+  if (!mode3d) {
+    btn.textContent = '◱ 2D'; btn.classList.add('active');
+    if (!attr3d) {
+      attr3d = new Attractor3D();
+      await attr3d.init();
+      attr3d.setPaletteLUT(PALETTES[state.palette]);
+    }
+    mode3d = true;
+    document.body.classList.add('mode-3d');
+    populateFamilies(true);
+    attr3d.setFamily($('familySelect').value);
+    attr3d.setPaletteLUT(PALETTES[state.palette]);
+    attr3d.activate();
+  } else {
+    mode3d = false;
+    btn.textContent = '⬗ 3D'; btn.classList.remove('active');
+    document.body.classList.remove('mode-3d');
+    if (attr3d) attr3d.deactivate();
+    populateFamilies(false);
+    reset();
+  }
 }
 
 // ---- share (compact URL) ------------------------------------------------
@@ -218,9 +302,20 @@ function bindButtons() {
     $('playBtn').textContent = running ? '❚❚ Pause' : '▶ Resume';
     $('playBtn').classList.toggle('paused', !running);
   });
-  $('randomBtn').addEventListener('click', () => { randomizeParams(); syncControls(); reset(); });
-  $('restartBtn').addEventListener('click', reset);
+  $('randomBtn').addEventListener('click', () => {
+    if (mode3d) {
+      const keys = Object.keys(ATTRACTOR3D);
+      const k = keys[(Math.random() * keys.length) | 0];
+      $('familySelect').value = k; attr3d.setFamily(k);
+    } else { randomizeParams(); syncControls(); reset(); }
+  });
+  $('restartBtn').addEventListener('click', () => {
+    if (mode3d) attr3d.setFamily($('familySelect').value);
+    else { view.zoom = 1; view.ox = 0; view.oy = 0; reset(); }
+  });
+  $('mode3dBtn').addEventListener('click', () => toggle3D());
   $('shareBtn').addEventListener('click', async () => {
+    if (mode3d) { try { await navigator.clipboard.writeText(location.origin + location.pathname); toast('Page link copied'); } catch { toast('—'); } return; }
     const code = encode();
     const url = `${location.origin}${location.pathname}#${code}`;
     history.replaceState(null, '', `#${code}`);
@@ -230,7 +325,7 @@ function bindButtons() {
   $('saveBtn').addEventListener('click', () => {
     const a = document.createElement('a');
     a.download = `claudo-attractor-${Date.now()}.png`;
-    a.href = canvas.toDataURL('image/png');
+    a.href = (mode3d && attr3d ? attr3d.canvas : canvas).toDataURL('image/png');
     a.click();
   });
   $('panelToggle').addEventListener('click', () => document.body.classList.toggle('panel-open'));
@@ -249,7 +344,8 @@ initNav('attractor');
 buildSelects();
 bindControls();
 bindButtons();
-window.addEventListener('resize', () => setup());
+bindZoom2D();
+window.addEventListener('resize', () => { if (!mode3d) setup(); });
 
 const hash = location.hash.slice(1);
 if (hash) decode(hash);

@@ -504,6 +504,18 @@ body.playing .hud { display: flex; }
 .ctl.checkbox { grid-template-columns: 1fr auto 42px; }
 .ctl.checkbox input[type="checkbox"] { width: 34px; height: 18px; accent-color: var(--accent); justify-self: start; cursor: pointer; }
 
+/* ---- 3D mode (Three.js) ---- */
+.three-canvas {
+  position: fixed; inset: 0; z-index: 1;
+  width: 100vw; height: 100vh; display: none;
+  cursor: grab; touch-action: none;
+}
+.three-canvas:active { cursor: grabbing; }
+body.mode-3d #stage { display: none; }
+body.mode-3d #params2d { display: none; }
+body.mode-3d .mode3d-only { display: block !important; }
+.btn.active { background: linear-gradient(135deg, var(--accent-2), #818cf8); border-color: transparent; color: #04121a; font-weight: 700; }
+
 /* ---- mode toggle (Ripple) ---- */
 .mode-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .mode-btn {
