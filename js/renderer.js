@@ -26,6 +26,7 @@ export class Renderer {
     this.glow = 0.55;
     this.particleSize = 2.0;
     this.trails = 0.82;         // 0 = no trails (clear each frame), ->1 = long trails
+    this.view = { zoom: 1, ox: 0, oy: 0 }; // pan/zoom in device px
     this.bg = '#07070c';
     this.resize();
     this._bakeSprites();
@@ -95,9 +96,11 @@ export class Renderer {
     ctx.globalCompositeOperation = 'lighter';
     const s = this.spriteSize;
     const half = s / 2;
+    const { zoom, ox, oy } = this.view;
     for (let i = 0; i < sim.count; i++) {
-      const x = sim.posX[i] * W;
-      const y = sim.posY[i] * H;
+      const x = sim.posX[i] * W * zoom + ox;
+      const y = sim.posY[i] * H * zoom + oy;
+      if (x < -s || x > W + s || y < -s || y > H + s) continue;
       ctx.drawImage(this.sprites[sim.color[i]], x - half, y - half);
     }
     ctx.globalCompositeOperation = 'source-over';

@@ -103,9 +103,10 @@ function buildPresets() {
 // ---- pointer interaction ------------------------------------------------
 function pointerPos(e) {
   const rect = canvas.getBoundingClientRect();
-  const cx = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-  const cy = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
-  return { x: cx / rect.width, y: cy / rect.height };
+  const dx = ((e.touches ? e.touches[0].clientX : e.clientX) - rect.left) * (canvas.width / rect.width);
+  const dy = ((e.touches ? e.touches[0].clientY : e.clientY) - rect.top) * (canvas.height / rect.height);
+  const v = renderer.view;
+  return { x: (dx - v.ox) / (canvas.width * v.zoom), y: (dy - v.oy) / (canvas.height * v.zoom) };
 }
 function bindPointer() {
   const down = (e) => {
@@ -128,6 +129,26 @@ function bindPointer() {
   canvas.addEventListener('touchstart', down, { passive: true });
   canvas.addEventListener('touchmove', move, { passive: false });
   window.addEventListener('touchend', up);
+
+  // Scroll / pinch to zoom about the cursor.
+  const zoomAt = (cssX, cssY, f) => {
+    const rect = canvas.getBoundingClientRect();
+    const dx = (cssX - rect.left) * (canvas.width / rect.width);
+    const dy = (cssY - rect.top) * (canvas.height / rect.height);
+    const v = renderer.view;
+    const wx = (dx - v.ox) / (canvas.width * v.zoom), wy = (dy - v.oy) / (canvas.height * v.zoom);
+    v.zoom = Math.max(0.5, Math.min(24, v.zoom * f));
+    v.ox = dx - wx * canvas.width * v.zoom; v.oy = dy - wy * canvas.height * v.zoom;
+  };
+  canvas.addEventListener('wheel', (e) => { e.preventDefault(); zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.0012)); }, { passive: false });
+  let pd = 0;
+  canvas.addEventListener('touchmove', (e) => {
+    if (e.touches.length !== 2) return;
+    const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+    if (pd) zoomAt((e.touches[0].clientX + e.touches[1].clientX) / 2, (e.touches[0].clientY + e.touches[1].clientY) / 2, d / pd);
+    pd = d; e.preventDefault();
+  }, { passive: false });
+  window.addEventListener('touchend', () => { pd = 0; });
 }
 
 // ---- buttons ------------------------------------------------------------

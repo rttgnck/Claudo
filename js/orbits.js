@@ -151,6 +151,25 @@ canvas.addEventListener('touchstart', down, { passive: true });
 canvas.addEventListener('touchmove', move, { passive: false });
 window.addEventListener('touchend', up);
 
+// Scroll / pinch to zoom, keeping the point under the cursor fixed.
+function zoomAt(sx, sy, factor) {
+  const [wx, wy] = toWorld(sx, sy);
+  cam.scale = Math.max(2, Math.min(4000, cam.scale * factor));
+  cam.x = wx - (sx - W / 2) / cam.scale;
+  cam.y = wy - (sy - H / 2) / cam.scale;
+  clearCanvas();
+}
+canvas.addEventListener('wheel', (e) => { e.preventDefault(); const [sx, sy] = pos(e); zoomAt(sx, sy, Math.exp(-e.deltaY * 0.0012)); }, { passive: false });
+let pinchD = 0;
+canvas.addEventListener('touchmove', (e) => {
+  if (e.touches.length !== 2) return;
+  const dx = e.touches[0].clientX - e.touches[1].clientX, dy = e.touches[0].clientY - e.touches[1].clientY;
+  const d = Math.hypot(dx, dy);
+  if (pinchD) { const r = canvas.getBoundingClientRect(); zoomAt((e.touches[0].clientX + e.touches[1].clientX) / 2 - r.left, (e.touches[0].clientY + e.touches[1].clientY) / 2 - r.top, d / pinchD); }
+  pinchD = d; e.preventDefault();
+}, { passive: false });
+window.addEventListener('touchend', () => { pinchD = 0; });
+
 // ---- render -------------------------------------------------------------
 function render() {
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);

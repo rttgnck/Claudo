@@ -366,4 +366,16 @@ else { loadPreset('Drift'); }
 syncControls();
 buildGrid();
 if (window.innerWidth > 820) document.body.classList.add('panel-open');
+
+// Scroll to zoom the grid.
+(() => {
+  const seqEl = $('seq'), wrap = seqEl.parentElement; let z = 1;
+  wrap.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    z = Math.max(0.5, Math.min(2.4, z * Math.exp(-e.deltaY * 0.0012)));
+    seqEl.style.transform = `scale(${z})`;
+    seqEl.style.transformOrigin = 'center top';
+  }, { passive: false });
+})();
+
 requestAnimationFrame(draw);

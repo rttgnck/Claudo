@@ -103,6 +103,21 @@ function resize() {
 window.addEventListener('resize', resize);
 resize();
 
+// Scroll / pinch to zoom the cross-section about the cursor.
+function zoomAt(mx, my, f) {
+  ccx = mx - (mx - ccx) * f; ccy = my - (my - ccy) * f;
+  scale = Math.max(8, Math.min(2000, scale * f));
+}
+canvas.addEventListener('wheel', (e) => { e.preventDefault(); const r = canvas.getBoundingClientRect(); zoomAt(e.clientX - r.left, e.clientY - r.top, Math.exp(-e.deltaY * 0.0012)); }, { passive: false });
+let fpinch = 0;
+canvas.addEventListener('touchmove', (e) => {
+  if (e.touches.length !== 2) return;
+  const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+  if (fpinch) { const r = canvas.getBoundingClientRect(); zoomAt((e.touches[0].clientX + e.touches[1].clientX) / 2 - r.left, (e.touches[0].clientY + e.touches[1].clientY) / 2 - r.top, d / fpinch); }
+  fpinch = d; e.preventDefault();
+}, { passive: false });
+window.addEventListener('touchend', () => { fpinch = 0; });
+
 // Point on a flux surface (poloidal cross-section) at minor-radius fraction rho.
 function fluxPoint(rho, theta) {
   const x = ccx + scale * (A_MINOR * rho) * Math.cos(theta + DELTA * rho * Math.sin(theta));

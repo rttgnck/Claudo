@@ -40,6 +40,14 @@ const state = { freq: 0.22, speed: 0.5, damping: 0.0015, palette: 'ocean', mode:
 let gw, gh, u, u1, wall, imgData, buf32, stepCount = 0;
 const sources = []; // {x,y}
 const pointer = { x: 0, y: 0, down: false };
+const view = { z: 1, cx: 0.5, cy: 0.5 }; // zoom viewport over the grid
+function srcRect() {
+  const sw = gw / view.z, sh = gh / view.z;
+  let sx = view.cx * gw - sw / 2, sy = view.cy * gh - sh / 2;
+  sx = Math.max(0, Math.min(gw - sw, sx)); sy = Math.max(0, Math.min(gh - sh, sy));
+  return { sx, sy, sw, sh };
+}
+function toGrid(nx, ny) { const r = srcRect(); return { gx: Math.round(r.sx + nx * r.sw), gy: Math.round(r.sy + ny * r.sh) }; }
 
 function setup() {
   const r = canvas.getBoundingClientRect();
@@ -126,16 +134,20 @@ function paint() {
     buf32[i] = (255 << 24) | (lut[li * 3 + 2] << 16) | (lut[li * 3 + 1] << 8) | lut[li * 3];
   }
   gctx.putImageData(imgData, 0, 0);
-  ctx.drawImage(grid, 0, 0, canvas.width, canvas.height);
-  // source markers
+  const r = srcRect();
+  ctx.drawImage(grid, r.sx, r.sy, r.sw, r.sh, 0, 0, canvas.width, canvas.height);
+  // source markers (mapped through the zoom viewport)
   ctx.fillStyle = 'rgba(255,255,255,0.85)';
-  const sx = canvas.width / gw, sy = canvas.height / gh;
-  for (const s of sources) { ctx.beginPath(); ctx.arc((s.x + 0.5) * sx, (s.y + 0.5) * sy, 4, 0, Math.PI * 2); ctx.fill(); }
+  for (const s of sources) {
+    const mx = (s.x - r.sx) / r.sw * canvas.width, my = (s.y - r.sy) / r.sh * canvas.height;
+    if (mx < 0 || my < 0 || mx > canvas.width || my > canvas.height) continue;
+    ctx.beginPath(); ctx.arc(mx, my, 4, 0, Math.PI * 2); ctx.fill();
+  }
 }
 
 function applyPointer() {
   if (!pointer.down) return;
-  const gx = Math.round(pointer.x * gw), gy = Math.round(pointer.y * gh);
+  const { gx, gy } = toGrid(pointer.x, pointer.y);
   if (state.mode === 'wall') paintWall(gx, gy, 3, false);
   else if (state.mode === 'erase') { paintWall(gx, gy, 5, true); for (let k = sources.length - 1; k >= 0; k--) if (Math.abs(sources[k].x - gx) < 6 && Math.abs(sources[k].y - gy) < 6) sources.splice(k, 1); }
 }
@@ -177,7 +189,7 @@ function loadPreset(name) { (PRESETS[name] || PRESETS.Single)(); clearField(); }
 function pos(e) { const r = canvas.getBoundingClientRect(); return { x: ((e.touches ? e.touches[0].clientX : e.clientX) - r.left) / r.width, y: ((e.touches ? e.touches[0].clientY : e.clientY) - r.top) / r.height }; }
 function down(e) {
   const p = pos(e); pointer.x = p.x; pointer.y = p.y; pointer.down = true;
-  const gx = Math.round(p.x * gw), gy = Math.round(p.y * gh);
+  const { gx, gy } = toGrid(p.x, p.y);
   if (state.mode === 'drop') drop(gx, gy, 4);
   else if (state.mode === 'source') sources.push({ x: gx, y: gy });
   $('hint')?.classList.add('gone');
@@ -190,6 +202,24 @@ window.addEventListener('mouseup', up);
 canvas.addEventListener('touchstart', down, { passive: true });
 canvas.addEventListener('touchmove', move, { passive: false });
 window.addEventListener('touchend', up);
+
+function zoomAt(px, py, f) {
+  const r = srcRect();
+  const gx = (r.sx + px * r.sw) / gw, gy = (r.sy + py * r.sh) / gh;
+  view.z = Math.max(1, Math.min(10, view.z * f));
+  const sw = gw / view.z, sh = gh / view.z;
+  view.cx = gx + (0.5 - px) * sw / gw; view.cy = gy + (0.5 - py) * sh / gh;
+}
+canvas.addEventListener('wheel', (e) => { e.preventDefault(); const r = canvas.getBoundingClientRect(); zoomAt((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height, Math.exp(-e.deltaY * 0.0012)); }, { passive: false });
+let rpinch = 0;
+canvas.addEventListener('touchmove', (e) => {
+  if (e.touches.length !== 2) return;
+  pointer.down = false;
+  const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+  if (rpinch) { const r = canvas.getBoundingClientRect(); zoomAt(((e.touches[0].clientX + e.touches[1].clientX) / 2 - r.left) / r.width, ((e.touches[0].clientY + e.touches[1].clientY) / 2 - r.top) / r.height, d / rpinch); }
+  rpinch = d; e.preventDefault();
+}, { passive: false });
+window.addEventListener('touchend', () => { rpinch = 0; });
 
 // ---- controls -----------------------------------------------------------
 function bindControls() {

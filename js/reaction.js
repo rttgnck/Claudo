@@ -53,6 +53,13 @@ const state = { f: 0.0545, k: 0.0620, palette: 'lagoon', speed: 12, Da: 1.0, Db:
 let gw, gh, A, B, A2, B2, imgData, buf32;
 let running = true;
 const pointer = { x: 0, y: 0, down: false };
+const view = { z: 1, cx: 0.5, cy: 0.5 }; // zoom viewport over the grid
+function srcRect() {
+  const sw = gw / view.z, sh = gh / view.z;
+  let sx = view.cx * gw - sw / 2, sy = view.cy * gh - sh / 2;
+  sx = Math.max(0, Math.min(gw - sw, sx)); sy = Math.max(0, Math.min(gh - sh, sy));
+  return { sx, sy, sw, sh };
+}
 
 function setup() {
   const rect = canvas.getBoundingClientRect();
@@ -134,13 +141,15 @@ function paint() {
     buf32[i] = (255 << 24) | (bl << 16) | (g << 8) | r;
   }
   gctx.putImageData(imgData, 0, 0);
-  ctx.drawImage(grid, 0, 0, canvas.width, canvas.height);
+  const r = srcRect();
+  ctx.drawImage(grid, r.sx, r.sy, r.sw, r.sh, 0, 0, canvas.width, canvas.height);
 }
 
 function applyPointer() {
   if (!pointer.down) return;
-  const gx = pointer.x * gw, gy = pointer.y * gh;
-  splash(gx, gy, Math.max(4, gh * 0.03));
+  const r = srcRect();
+  const gx = r.sx + pointer.x * r.sw, gy = r.sy + pointer.y * r.sh;
+  splash(gx, gy, Math.max(4, gh * 0.03) / view.z);
 }
 
 function loop() {
@@ -183,6 +192,23 @@ function bindPointer() {
   canvas.addEventListener('touchstart', down, { passive: true });
   canvas.addEventListener('touchmove', move, { passive: false });
   window.addEventListener('touchend', up);
+
+  const zoomAt = (px, py, f) => {
+    const r = srcRect();
+    const gx = (r.sx + px * r.sw) / gw, gy = (r.sy + py * r.sh) / gh;
+    view.z = Math.max(1, Math.min(9, view.z * f));
+    const sw = gw / view.z, sh = gh / view.z;
+    view.cx = gx + (0.5 - px) * sw / gw; view.cy = gy + (0.5 - py) * sh / gh;
+  };
+  canvas.addEventListener('wheel', (e) => { e.preventDefault(); const r = canvas.getBoundingClientRect(); zoomAt((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height, Math.exp(-e.deltaY * 0.0012)); }, { passive: false });
+  let pd = 0;
+  canvas.addEventListener('touchmove', (e) => {
+    if (e.touches.length !== 2) return;
+    const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+    if (pd) { const r = canvas.getBoundingClientRect(); zoomAt(((e.touches[0].clientX + e.touches[1].clientX) / 2 - r.left) / r.width, ((e.touches[0].clientY + e.touches[1].clientY) / 2 - r.top) / r.height, d / pd); }
+    pd = d; e.preventDefault();
+  }, { passive: false });
+  window.addEventListener('touchend', () => { pd = 0; });
 }
 
 // ---- share --------------------------------------------------------------

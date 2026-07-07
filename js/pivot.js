@@ -38,6 +38,7 @@ const collectSound = (combo) => beep(220 * Math.pow(2, PENT[Math.min(combo, PENT
 
 // ---- game state ---------------------------------------------------------
 const PLAYER_HALF = 0.09;
+let zoom = 1;               // scroll/pinch scene zoom (visual only)
 let mode = 'menu';          // menu | play | dead
 let ang, dir, omega, score, combo, best, shake, obstacles, orbs, particles, pulse, t;
 best = +(localStorage.getItem('pivot-best') || 0);
@@ -97,7 +98,7 @@ function die() {
 }
 
 // ---- helpers ------------------------------------------------------------
-function ring(a, r = R) { return { x: cx + Math.cos(a) * r, y: cy + Math.sin(a) * r }; }
+function ring(a, r = R * zoom) { return { x: cx + Math.cos(a) * r, y: cy + Math.sin(a) * r }; }
 function burst(p, n, color, speed) {
   const out = [];
   for (let i = 0; i < n; i++) {
@@ -168,11 +169,11 @@ function render() {
   ctx.translate(sx, sy);
 
   // ring
-  ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2);
+  ctx.beginPath(); ctx.arc(cx, cy, R * zoom, 0, Math.PI * 2);
   ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.lineWidth = 2; ctx.stroke();
 
   // sun
-  const sunR = 22 + pulse * 10 + Math.sin(t * 2) * 2;
+  const sunR = (22 + pulse * 10 + Math.sin(t * 2) * 2) * zoom;
   const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, sunR * 3);
   grad.addColorStop(0, 'rgba(255,220,150,0.9)');
   grad.addColorStop(0.3, 'rgba(255,140,80,0.4)');
@@ -194,8 +195,8 @@ function render() {
   // blades
   for (const o of obstacles) {
     ctx.beginPath();
-    ctx.arc(cx, cy, R, o.ang - o.half, o.ang + o.half);
-    ctx.strokeStyle = '#ff5c7c'; ctx.lineWidth = 15; ctx.lineCap = 'round';
+    ctx.arc(cx, cy, R * zoom, o.ang - o.half, o.ang + o.half);
+    ctx.strokeStyle = '#ff5c7c'; ctx.lineWidth = 15 * zoom; ctx.lineCap = 'round';
     ctx.shadowColor = '#ff5c7c'; ctx.shadowBlur = 18; ctx.stroke();
     ctx.shadowBlur = 0;
   }
@@ -233,6 +234,7 @@ function frame(now) {
 
 // ---- input --------------------------------------------------------------
 canvas.addEventListener('pointerdown', (e) => { e.preventDefault(); flip(); });
+canvas.addEventListener('wheel', (e) => { e.preventDefault(); zoom = Math.max(0.5, Math.min(2.2, zoom * Math.exp(-e.deltaY * 0.0012))); }, { passive: false });
 window.addEventListener('keydown', (e) => {
   if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'Enter') { e.preventDefault(); flip(); }
 });
