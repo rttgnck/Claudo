@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Claudo · Pivot — a one-tap reflex arcade</title>
+  <meta name="description" content="Orbit a sun, tap to reverse, weave through spinning blades and sweep up orbs. One input, endless panic. How high can you score?" />
+  <meta name="theme-color" content="#07070c" />
+  <meta property="og:title" content="Claudo · Pivot" />
+  <meta property="og:description" content="A one-tap reflex arcade — reverse your orbit, dodge the blades, chase the combo." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='11' cy='13' r='5' fill='%234ade80'/><circle cx='21' cy='19' r='5' fill='%23ff5c7c'/><circle cx='19' cy='9' r='4' fill='%23a78bfa'/></svg>" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <canvas id="stage"></canvas>
+
+  <header id="topbar">
+    <div id="logo" class="logo">
+      <span class="dot d1" style="background:#4ade80;color:#4ade80"></span><span class="dot d2" style="background:#ff5c7c;color:#ff5c7c"></span><span class="dot d3" style="background:#a78bfa;color:#a78bfa"></span>
+      <span class="word">Claudo</span>
+    </div>
+    <div class="actions">
+      <button id="muteBtn" class="btn ghost" title="Mute / unmute">🔊</button>
+    </div>
+  </header>
+
+  <!-- HUD (visible while playing) -->
+  <div id="hud" class="hud">
+    <div class="score-line"><span id="scoreVal">0</span><span id="comboVal" class="combo"></span></div>
+    <div class="best-line">best <b id="bestVal">0</b></div>
+  </div>
+
+  <!-- Start screen -->
+  <div id="startScreen" class="overlay">
+    <div class="card">
+      <div class="game-logo"><span></span><span></span><span></span></div>
+      <h1>Pivot</h1>
+      <p>You orbit the sun. <b>Tap, click, or press space</b> to reverse direction.<br />Grab the green orbs, dodge the red blades, keep your combo alive.</p>
+      <button id="startBtn" class="btn primary big">▶ Play</button>
+      <div class="mini">best <b id="bestValMenu"></b></div>
+    </div>
+  </div>
+
+  <!-- Game over -->
+  <div id="overScreen" class="overlay hide">
+    <div class="card">
+      <div id="newBest" class="badge hide">★ New best!</div>
+      <h2>Game Over</h2>
+      <div class="final"><span class="final-num" id="finalScore">0</span><span class="final-lbl">score</span></div>
+      <div class="final small"><span class="final-num" id="finalBest">0</span><span class="final-lbl">best</span></div>
+      <div class="over-actions">
+        <button id="againBtn" class="btn primary big">↻ Play again</button>
+        <button id="shareBtn" class="btn">⇪ Share</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script type="module" src="js/pivot.js"></script>
+</body>
+</html>

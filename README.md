@@ -29,7 +29,19 @@ self-organizing into coral, spots, mazes, and dividing cells — the same math t
 paints seashells and animal coats. Drag on the canvas to inject chemical and
 watch it spread.
 
-Each one lets you **randomize**, load **curated presets**, **share** the exact
+### 🩷🔵🟡 Pulse — *a step sequencer you can play*
+A Web Audio drum machine and melody sequencer. Four synthesized drum voices plus
+an 8-note melody lane that's **locked to a musical scale**, so every beat you tap
+out (or randomize) lands in key. Tempo, swing, presets, and a look-ahead
+scheduler for rock-solid timing. Hit space to play; share your loop by URL.
+
+### 🟢🩷🟣 Pivot — *a one-tap reflex arcade*
+A game. You orbit a sun on a ring; **tap, click, or press space** to reverse
+direction. Weave through spinning blades, sweep up glowing orbs, and stack your
+combo. Screen shake, particles, sound, and a local high score. One input, endless
+panic.
+
+The generative pages let you **randomize**, load **presets**, **share** the exact
 state via a compact URL, and **save a PNG**.
 
 ---
@@ -77,10 +89,9 @@ python3 -m http.server 4177
 ## Structure
 
 ```
-index.html           Particle Life page
-attractor.html       Attractors page
-reaction.html        Reaction page
-css/style.css        the shared look
+index.html           Particle Life page      pulse.html      Pulse page
+attractor.html       Attractors page         pivot.html      Pivot page
+reaction.html        Reaction page           css/style.css   the shared look
 
 js/nav.js            the brand-as-dropdown navigation
 js/app.js            Particle Life glue
@@ -91,6 +102,8 @@ js/presets.js        curated universes
 js/share.js          pack/unpack a universe into a URL
 js/attractor.js      strange-attractor accumulator + rendering
 js/reaction.js       Gray-Scott reaction-diffusion engine
+js/pulse.js          Web Audio sequencer + look-ahead scheduler
+js/pivot.js          the Pivot arcade game
 ```
 
 ## Credits

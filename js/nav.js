@@ -3,9 +3,11 @@
 // consistent menu.
 
 const PAGES = [
-  { href: 'index.html',     key: 'life',      name: 'Particle Life', desc: 'Emergent life from a rule matrix', dots: ['#ff5c7c', '#38bdf8', '#4ade80'] },
-  { href: 'attractor.html', key: 'attractor', name: 'Attractors',    desc: 'Chaos plotted into strange beauty', dots: ['#ffd166', '#fb923c', '#f472b6'] },
-  { href: 'reaction.html',  key: 'reaction',  name: 'Reaction',      desc: 'Living Turing patterns you paint',  dots: ['#2dd4bf', '#a78bfa', '#38bdf8'] },
+  { href: 'index.html',     key: 'life',      group: 'Generative',  name: 'Particle Life', desc: 'Emergent life from a rule matrix', dots: ['#ff5c7c', '#38bdf8', '#4ade80'] },
+  { href: 'attractor.html', key: 'attractor', group: 'Generative',  name: 'Attractors',    desc: 'Chaos plotted into strange beauty', dots: ['#ffd166', '#fb923c', '#f472b6'] },
+  { href: 'reaction.html',  key: 'reaction',  group: 'Generative',  name: 'Reaction',      desc: 'Living Turing patterns you paint',  dots: ['#2dd4bf', '#a78bfa', '#38bdf8'] },
+  { href: 'pulse.html',     key: 'pulse',     group: 'Interactive', name: 'Pulse',         desc: 'A step sequencer you can play',      dots: ['#f472b6', '#38bdf8', '#ffd166'] },
+  { href: 'pivot.html',     key: 'pivot',     group: 'Interactive', name: 'Pivot',         desc: 'A one-tap reflex arcade',           dots: ['#4ade80', '#ff5c7c', '#a78bfa'] },
 ];
 
 export function initNav(currentKey) {
@@ -22,12 +24,18 @@ export function initNav(currentKey) {
 
   const menu = document.createElement('div');
   menu.className = 'nav-menu';
-  menu.innerHTML = `<div class="nav-menu-head">Explore</div>` + PAGES.map((p) => `
+  let html = '';
+  let lastGroup = null;
+  for (const p of PAGES) {
+    if (p.group !== lastGroup) { html += `<div class="nav-menu-head">${p.group}</div>`; lastGroup = p.group; }
+    html += `
     <a class="nav-item${p.key === currentKey ? ' current' : ''}" href="${p.href}">
       <span class="nav-dots">${p.dots.map((c) => `<i style="background:${c};color:${c}"></i>`).join('')}</span>
       <span class="nav-text"><b>${p.name}</b><small>${p.desc}</small></span>
       ${p.key === currentKey ? '<span class="nav-here">●</span>' : ''}
-    </a>`).join('');
+    </a>`;
+  }
+  menu.innerHTML = html;
   document.body.appendChild(menu);
 
   const place = () => {

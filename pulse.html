@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Claudo · Pulse — a step sequencer you can play</title>
+  <meta name="description" content="A browser step sequencer: synthesized drums plus a scale-locked melody lane, so every beat you tap out sounds musical. Tune the groove and share your loop." />
+  <meta name="theme-color" content="#07070c" />
+  <meta property="og:title" content="Claudo · Pulse" />
+  <meta property="og:description" content="Tap out a beat that's always in key — synth drums and a scale-locked melody sequencer in your browser." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='11' cy='13' r='5' fill='%23f472b6'/><circle cx='21' cy='19' r='5' fill='%2338bdf8'/><circle cx='19' cy='9' r='4' fill='%23ffd166'/></svg>" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="page-centered">
+  <div class="bg-gradient"></div>
+
+  <header id="topbar">
+    <div id="logo" class="logo">
+      <span class="dot d1" style="background:#f472b6;color:#f472b6"></span><span class="dot d2" style="background:#38bdf8;color:#38bdf8"></span><span class="dot d3" style="background:#ffd166;color:#ffd166"></span>
+      <span class="word">Claudo</span>
+    </div>
+    <div class="actions">
+      <select id="presetSelect" title="Load a groove"><option value="" disabled selected>Presets…</option></select>
+      <button id="playBtn" class="btn primary" title="Play / stop (Space)">▶ Play</button>
+      <button id="randomBtn" class="btn" title="Generate a musical pattern">⚄ Randomize</button>
+      <button id="clearBtn" class="btn ghost" title="Clear the grid">⌫ Clear</button>
+      <button id="shareBtn" class="btn" title="Copy a link to this pattern">⇪ Share</button>
+      <button id="panelToggle" class="btn ghost only-narrow" title="Toggle controls">⚙</button>
+    </div>
+  </header>
+
+  <main class="stage-center">
+    <div class="seq-wrap">
+      <div id="seq" class="seq"></div>
+    </div>
+  </main>
+
+  <aside id="panel">
+    <button class="panel-close only-narrow" onclick="document.body.classList.remove('panel-open')">✕</button>
+    <section class="group">
+      <h3>Groove</h3>
+      <p class="tip">Top rows are the melody (locked to a scale, so it always sounds right); the four coloured rows are drums. Tap cells, or hit <b>Randomize</b>.</p>
+      <label class="ctl"><span>Tempo</span><input id="bpmRange" type="range" min="60" max="180" step="1" value="112" /><output id="bpmVal">112</output></label>
+      <label class="ctl"><span>Swing</span><input id="swingRange" type="range" min="0" max="0.6" step="0.01" value="0.12" /><output id="swingVal">12%</output></label>
+      <label class="ctl"><span>Volume</span><input id="volRange" type="range" min="0" max="1" step="0.01" value="0.8" /><output id="volVal">80</output></label>
+    </section>
+    <section class="group">
+      <h3>Key</h3>
+      <label class="ctl"><span>Root</span><select id="keySelect" class="inline-select"></select><output></output></label>
+      <label class="ctl"><span>Scale</span>
+        <select id="scaleSelect" class="inline-select"><option value="minor">Minor pentatonic</option><option value="major">Major pentatonic</option></select><output></output></label>
+    </section>
+    <footer class="panel-foot">
+      <span>space = play/stop</span>
+      <a href="https://en.wikipedia.org/wiki/Pentatonic_scale" target="_blank" rel="noopener">why it sounds good</a>
+    </footer>
+  </aside>
+
+  <div id="toast"></div>
+
+  <script type="module" src="js/pulse.js"></script>
+</body>
+</html>
