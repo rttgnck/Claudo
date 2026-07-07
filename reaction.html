@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Claudo · Reaction — living Turing patterns you can paint</title>
+  <meta name="description" content="A Gray-Scott reaction-diffusion sandbox. Two virtual chemicals grow coral, spots, mazes and dividing cells. Paint with your cursor and watch it spread." />
+  <meta name="theme-color" content="#07070c" />
+  <meta property="og:title" content="Claudo · Reaction" />
+  <meta property="og:description" content="Living Turing patterns — the same math that paints seashells, in your browser. Paint and watch it grow." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='11' cy='13' r='5' fill='%232dd4bf'/><circle cx='21' cy='19' r='5' fill='%23a78bfa'/><circle cx='19' cy='9' r='4' fill='%2338bdf8'/></svg>" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <canvas id="stage"></canvas>
+
+  <header id="topbar">
+    <div id="logo" class="logo">
+      <span class="dot d1" style="background:#2dd4bf;color:#2dd4bf"></span><span class="dot d2" style="background:#a78bfa;color:#a78bfa"></span><span class="dot d3" style="background:#38bdf8;color:#38bdf8"></span>
+      <span class="word">Claudo</span>
+    </div>
+    <div class="actions">
+      <select id="presetSelect" title="Load a pattern regime"><option value="" disabled selected>Presets…</option></select>
+      <button id="playBtn" class="btn">❚❚ Pause</button>
+      <button id="randomBtn" class="btn" title="Random pattern regime">⚄ Randomize</button>
+      <button id="resetBtn" class="btn ghost" title="Clear and re-seed">↻ Reset</button>
+      <button id="shareBtn" class="btn primary" title="Copy a link to this pattern">⇪ Share</button>
+      <button id="saveBtn" class="btn ghost" title="Save a PNG">⇩ PNG</button>
+      <button id="panelToggle" class="btn ghost only-narrow" title="Toggle controls">⚙</button>
+    </div>
+  </header>
+
+  <aside id="panel">
+    <button class="panel-close only-narrow" onclick="document.body.classList.remove('panel-open')">✕</button>
+
+    <section class="group">
+      <h3>Chemistry</h3>
+      <p class="tip">Two chemicals, one reaction. <b>Feed</b> adds chemical A; <b>Kill</b> removes B. Tiny changes flip the whole pattern between coral, mazes, and mitosis.</p>
+      <label class="ctl"><span>Feed</span><input id="feedRange" type="range" min="0.005" max="0.09" step="0.0005" value="0.0545" /><output id="feedVal">0.0545</output></label>
+      <label class="ctl"><span>Kill</span><input id="killRange" type="range" min="0.03" max="0.073" step="0.0005" value="0.0620" /><output id="killVal">0.0620</output></label>
+      <label class="ctl"><span>Speed</span><input id="speedRange" type="range" min="2" max="24" step="1" value="12" /><output id="speedVal">12</output></label>
+    </section>
+
+    <section class="group">
+      <h3>Look</h3>
+      <label class="ctl"><span>Palette</span><select id="paletteSelect" class="inline-select"></select><output></output></label>
+    </section>
+
+    <footer class="panel-foot">
+      <span>drag on canvas to paint</span>
+      <a href="https://en.wikipedia.org/wiki/Turing_pattern" target="_blank" rel="noopener">what is this?</a>
+    </footer>
+  </aside>
+
+  <div id="hint">
+    <div class="hint-inner">
+      <strong>The math that paints seashells.</strong>
+      Two chemicals diffuse and react — and organize themselves into coral, spots, and mazes with no blueprint at all.
+      <span>Drag on the canvas to paint · Try the presets · Randomize · Share your favorite regime.</span>
+    </div>
+  </div>
+  <div id="toast"></div>
+
+  <script type="module" src="js/reaction.js"></script>
+</body>
+</html>

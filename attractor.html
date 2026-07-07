@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Claudo · Attractors — chaos plotted into strange beauty</title>
+  <meta name="description" content="Strange attractors rendered like a long-exposure of pure math. Tune four numbers, watch chaos resolve into intricate structure, and share what you find." />
+  <meta name="theme-color" content="#07070c" />
+  <meta property="og:title" content="Claudo · Attractors" />
+  <meta property="og:description" content="Chaos plotted into strange beauty — tune four numbers and watch the math develop like a photograph." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='11' cy='13' r='5' fill='%23ffd166'/><circle cx='21' cy='19' r='5' fill='%23fb923c'/><circle cx='19' cy='9' r='4' fill='%23f472b6'/></svg>" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <canvas id="stage"></canvas>
+
+  <header id="topbar">
+    <div id="logo" class="logo">
+      <span class="dot d1" style="background:#ffd166;color:#ffd166"></span><span class="dot d2" style="background:#fb923c;color:#fb923c"></span><span class="dot d3" style="background:#f472b6;color:#f472b6"></span>
+      <span class="word">Claudo</span>
+    </div>
+    <div class="actions">
+      <button id="playBtn" class="btn">❚❚ Pause</button>
+      <button id="randomBtn" class="btn" title="Roll new attractor parameters">⚄ Randomize</button>
+      <button id="restartBtn" class="btn ghost" title="Re-develop the exposure">↻ Reset</button>
+      <button id="shareBtn" class="btn primary" title="Copy a link to this attractor">⇪ Share</button>
+      <button id="saveBtn" class="btn ghost" title="Save a PNG">⇩ PNG</button>
+      <button id="panelToggle" class="btn ghost only-narrow" title="Toggle controls">⚙</button>
+    </div>
+  </header>
+
+  <aside id="panel">
+    <button class="panel-close only-narrow" onclick="document.body.classList.remove('panel-open')">✕</button>
+
+    <section class="group">
+      <h3>Attractor</h3>
+      <p class="tip">A chaotic map iterated millions of times. Each of the four numbers reshapes the whole structure — nudge them slowly.</p>
+      <label class="ctl"><span>Family</span><select id="familySelect" class="inline-select"></select><output></output></label>
+      <label class="ctl"><span>a</span><input id="pA" type="range" min="-2" max="2" step="0.005" /><output id="pAV">0</output></label>
+      <label class="ctl"><span>b</span><input id="pB" type="range" min="-2" max="2" step="0.005" /><output id="pBV">0</output></label>
+      <label class="ctl"><span>c</span><input id="pC" type="range" min="-2" max="2" step="0.005" /><output id="pCV">0</output></label>
+      <label class="ctl"><span>d</span><input id="pD" type="range" min="-2" max="2" step="0.005" /><output id="pDV">0</output></label>
+    </section>
+
+    <section class="group">
+      <h3>Render</h3>
+      <label class="ctl"><span>Palette</span><select id="paletteSelect" class="inline-select"></select><output></output></label>
+      <label class="ctl"><span>Density</span><input id="rateRange" type="range" min="30000" max="300000" step="10000" value="130000" /><output id="rateVal">130k</output></label>
+    </section>
+
+    <footer class="panel-foot">
+      <span id="samples">0 pts</span>
+      <a href="https://en.wikipedia.org/wiki/Attractor#Strange_attractor" target="_blank" rel="noopener">what is this?</a>
+    </footer>
+  </aside>
+
+  <div id="hint">
+    <div class="hint-inner">
+      <strong>Chaos, developing like a photograph.</strong>
+      A simple equation iterated millions of times traces out an infinitely intricate shape.
+      <span>Drag a, b, c, d to reshape it · Randomize for a new one · Share the coordinates you love.</span>
+    </div>
+  </div>
+  <div id="toast"></div>
+
+  <script type="module" src="js/attractor.js"></script>
+</body>
+</html>

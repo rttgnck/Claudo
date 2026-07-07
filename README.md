@@ -1,15 +1,36 @@
 # Claudo
 
-**A particle-life studio in your browser.** Thousands of colored particles, one
-absurdly simple rule — *each color attracts or repels every other color by an
-amount you choose* — and out of it crawls something that looks unnervingly
-alive: cells that grow membranes, swarms that hunt, crystals that lattice,
-comets that streak across a toroidal sky.
-
-No installs, no dependencies, no build step. Just open it and start tuning the
-laws of a tiny universe.
+**A little suite of generative playgrounds** where dead-simple rules bloom into
+startling complexity. No installs, no dependencies, no build step — three
+full-screen toys, each shareable by URL. Switch between them from the **Claudo ▾**
+menu in the corner.
 
 ### ▶ [Launch Claudo](https://rttgnck.github.io/Claudo/)
+
+---
+
+## The three experiences
+
+### 🔴🔵🟢 Particle Life — *emergent life from a rule matrix*
+Thousands of colored particles, one absurdly simple rule — *each color attracts
+or repels every other color by an amount you choose* — and out of it crawls
+something that looks unnervingly alive: cells that grow membranes, swarms that
+hunt, crystals that lattice, comets that streak across a toroidal sky.
+
+### 🟡🟠🟣 Attractors — *chaos plotted into strange beauty*
+Iterate a chaotic equation millions of times and accumulate where it lands. The
+picture "develops" like a long-exposure photograph into infinitely intricate
+strange attractors (Clifford, De Jong, Svensson). Nudge four numbers and the
+entire structure reshapes.
+
+### 🟢🟣🔵 Reaction — *living Turing patterns you can paint*
+A Gray-Scott reaction-diffusion sandbox: two virtual chemicals diffuse and react,
+self-organizing into coral, spots, mazes, and dividing cells — the same math that
+paints seashells and animal coats. Drag on the canvas to inject chemical and
+watch it spread.
+
+Each one lets you **randomize**, load **curated presets**, **share** the exact
+state via a compact URL, and **save a PNG**.
 
 ---
 
@@ -56,14 +77,20 @@ python3 -m http.server 4177
 ## Structure
 
 ```
-index.html           layout + controls
-css/style.css        the whole look
+index.html           Particle Life page
+attractor.html       Attractors page
+reaction.html        Reaction page
+css/style.css        the shared look
+
+js/nav.js            the brand-as-dropdown navigation
+js/app.js            Particle Life glue
 js/simulation.js     spatial-hash physics engine
 js/renderer.js       glow-sprite + trail rendering
 js/ui.js             the drag-to-edit interaction matrix
 js/presets.js        curated universes
 js/share.js          pack/unpack a universe into a URL
-js/app.js            glue
+js/attractor.js      strange-attractor accumulator + rendering
+js/reaction.js       Gray-Scott reaction-diffusion engine
 ```
 
 ## Credits
