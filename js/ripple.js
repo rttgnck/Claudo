@@ -5,8 +5,10 @@
 // ripples, place oscillating sources, or paint reflecting walls and watch real
 // interference and diffraction — including the double-slit experiment.
 import { initNav } from './nav.js';
+import { Ripple3D } from './ripple3d.js';
 
 const $ = (id) => document.getElementById(id);
+let mode3d = false, r3d = null;
 const canvas = $('stage');
 const ctx = canvas.getContext('2d');
 const grid = document.createElement('canvas');
@@ -152,13 +154,31 @@ function applyPointer() {
   else if (state.mode === 'erase') { paintWall(gx, gy, 5, true); for (let k = sources.length - 1; k >= 0; k--) if (Math.abs(sources[k].x - gx) < 6 && Math.abs(sources[k].y - gy) < 6) sources.splice(k, 1); }
 }
 
-function loop() {
+let lastT = performance.now();
+function loop(now) {
+  const dt = Math.min((now - lastT) / 1000, 0.05); lastT = now;
   if (state.running) {
     applyPointer();
     step(); step(); step();
   }
-  paint();
+  if (mode3d) { if (r3d && r3d.ready) { r3d.update(u1, gw, gh, wall); r3d.render(dt); } }
+  else paint();
   requestAnimationFrame(loop);
+}
+
+async function toggle3D() {
+  const btn = $('mode3dBtn');
+  if (!mode3d) {
+    if (!r3d) { r3d = new Ripple3D(); await r3d.init(gw, gh); }
+    r3d.setPaletteLUT(PALETTES[state.palette]);
+    mode3d = true; document.body.classList.add('mode-3d');
+    btn.textContent = '◱ 2D'; btn.classList.add('active');
+    r3d.activate();
+  } else {
+    mode3d = false; document.body.classList.remove('mode-3d');
+    btn.textContent = '⬗ 3D'; btn.classList.remove('active');
+    if (r3d) r3d.deactivate();
+  }
 }
 
 // ---- presets ------------------------------------------------------------
@@ -226,7 +246,7 @@ function bindControls() {
   $('freqRange').addEventListener('input', () => { state.freq = parseFloat($('freqRange').value); $('freqVal').textContent = state.freq.toFixed(2); });
   $('speedRange').addEventListener('input', () => { state.speed = parseFloat($('speedRange').value); $('speedVal').textContent = state.speed.toFixed(2); });
   $('dampRange').addEventListener('input', () => { state.damping = parseFloat($('dampRange').value); $('dampVal').textContent = state.damping.toFixed(3); });
-  $('paletteSelect').addEventListener('change', () => { state.palette = $('paletteSelect').value; });
+  $('paletteSelect').addEventListener('change', () => { state.palette = $('paletteSelect').value; if (r3d) r3d.setPaletteLUT(PALETTES[state.palette]); });
   document.querySelectorAll('.mode-btn').forEach((b) => b.addEventListener('click', () => {
     state.mode = b.dataset.mode;
     document.querySelectorAll('.mode-btn').forEach((x) => x.classList.toggle('active', x === b));
@@ -243,6 +263,7 @@ function bindButtons() {
   $('playBtn').addEventListener('click', () => { state.running = !state.running; $('playBtn').textContent = state.running ? '❚❚ Pause' : '▶ Play'; $('playBtn').classList.toggle('paused', !state.running); });
   $('clearBtn').addEventListener('click', clearField);
   $('resetBtn').addEventListener('click', clearAll);
+  $('mode3dBtn').addEventListener('click', () => toggle3D());
   $('panelToggle').addEventListener('click', () => document.body.classList.toggle('panel-open'));
 }
 
