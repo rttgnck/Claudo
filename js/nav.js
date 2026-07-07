@@ -8,6 +8,9 @@ const PAGES = [
   { href: 'reaction.html',  key: 'reaction',  group: 'Generative',  name: 'Reaction',      desc: 'Living Turing patterns you paint',  dots: ['#2dd4bf', '#a78bfa', '#38bdf8'] },
   { href: 'pulse.html',     key: 'pulse',     group: 'Interactive', name: 'Pulse',         desc: 'A step sequencer you can play',      dots: ['#f472b6', '#38bdf8', '#ffd166'] },
   { href: 'pivot.html',     key: 'pivot',     group: 'Interactive', name: 'Pivot',         desc: 'A one-tap reflex arcade',           dots: ['#4ade80', '#ff5c7c', '#a78bfa'] },
+  { href: 'fusion.html',    key: 'fusion',    group: 'Science',     name: 'Fusion',        desc: 'Ignite a tokamak plasma',           dots: ['#ff6b5c', '#ff9a5c', '#ffd166'] },
+  { href: 'orbits.html',    key: 'orbits',    group: 'Science',     name: 'Orbits',        desc: 'An N-body gravity sandbox',         dots: ['#ffd166', '#4ade80', '#38bdf8'] },
+  { href: 'ripple.html',    key: 'ripple',    group: 'Science',     name: 'Ripple',        desc: 'A 2-D wave interference tank',      dots: ['#38bdf8', '#2dd4bf', '#7dd3fc'] },
 ];
 
 export function initNav(currentKey) {

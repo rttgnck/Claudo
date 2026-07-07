@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Claudo · Fusion — ignite a tokamak plasma</title>
+  <meta name="description" content="A real 0-D tokamak burn simulator with Bosch–Hale D-T reactivity, alpha self-heating and bremsstrahlung losses. Tune density, heating, confinement and field until the plasma ignites." />
+  <meta name="theme-color" content="#07070c" />
+  <meta property="og:title" content="Claudo · Fusion" />
+  <meta property="og:description" content="Can you ignite a fusion plasma? A physically real tokamak burn model in your browser." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='7' fill='%23ff9a5c'/><circle cx='16' cy='16' r='3' fill='%23fff'/></svg>" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <canvas id="stage"></canvas>
+
+  <header id="topbar">
+    <div id="logo" class="logo">
+      <span class="dot d1" style="background:#ff6b5c;color:#ff6b5c"></span><span class="dot d2" style="background:#ff9a5c;color:#ff9a5c"></span><span class="dot d3" style="background:#ffd166;color:#ffd166"></span>
+      <span class="word">Claudo</span>
+    </div>
+    <div class="actions">
+      <button id="playBtn" class="btn">❚❚ Pause</button>
+      <button id="igniteBtn" class="btn primary" title="Load an ignitable configuration">▲ Ignite</button>
+      <button id="coldBtn" class="btn ghost" title="Cool the plasma back down">❄ Cool</button>
+      <button id="shareBtn" class="btn ghost" title="Copy a link to this reactor">⇪ Share</button>
+      <button id="panelToggle" class="btn ghost only-narrow" title="Toggle controls">⚙</button>
+    </div>
+  </header>
+
+  <aside id="panel">
+    <button class="panel-close only-narrow" onclick="document.body.classList.remove('panel-open')">✕</button>
+
+    <section class="group">
+      <h3>Reactor controls</h3>
+      <p class="tip">A deuterium–tritium tokamak. Get hot &amp; dense enough that alpha particles heat the plasma faster than it leaks — then cut the heating and watch it stay lit.</p>
+      <label class="ctl"><span>Density</span><input id="nRange" type="range" min="0.2" max="2" step="0.02" value="1" /><output id="nVal">1.00</output></label>
+      <label class="ctl"><span>Heating</span><input id="pauxRange" type="range" min="0" max="150" step="1" value="50" /><output id="pauxVal">50</output></label>
+      <label class="ctl"><span>Confine τ</span><input id="tauRange" type="range" min="0.2" max="5" step="0.1" value="3" /><output id="tauVal">3.0</output></label>
+      <label class="ctl"><span>Field B</span><input id="bRange" type="range" min="2" max="13" step="0.1" value="5.3" /><output id="bVal">5.3</output></label>
+      <p class="tip mini-units">n ×10²⁰ m⁻³ · heating MW · τ seconds · B tesla</p>
+    </section>
+
+    <section class="group">
+      <h3>Plasma</h3>
+      <div class="readouts">
+        <div class="readout big"><span class="rv" id="tOut">0.5</span><span class="rl">temperature · keV</span></div>
+        <div class="readout"><span class="rv" id="pfusOut">0 MW</span><span class="rl">fusion power</span></div>
+        <div class="readout"><span class="rv" id="qOut">—</span><span class="rl">gain Q = fusion / heating</span></div>
+      </div>
+      <div class="meter"><div class="meter-head"><span>Lawson triple product</span><b id="tripleOut">0</b></div><div class="bar"><i id="tripleBar"></i><u class="thr"></u></div></div>
+      <div class="meter"><div class="meter-head"><span>Plasma β vs limit</span><b id="betaOut">0%</b></div><div class="bar"><i id="betaBar"></i><u class="thr" style="left:100%"></u></div></div>
+      <div id="statusOut" class="status">Cold plasma</div>
+    </section>
+
+    <footer class="panel-foot">
+      <span>Bosch–Hale D-T</span>
+      <a href="https://en.wikipedia.org/wiki/Lawson_criterion" target="_blank" rel="noopener">Lawson criterion</a>
+    </footer>
+  </aside>
+
+  <div id="toast"></div>
+  <script type="module" src="js/fusion.js"></script>
+</body>
+</html>

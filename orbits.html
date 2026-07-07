@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Claudo · Orbits — an N-body gravity sandbox</title>
+  <meta name="description" content="A real N-body gravity simulator with velocity-Verlet integration and merging collisions. Fling planets, build solar systems, and run the famous figure-8 three-body orbit." />
+  <meta name="theme-color" content="#07070c" />
+  <meta property="og:title" content="Claudo · Orbits" />
+  <meta property="og:description" content="Drag to fling planets into a real N-body gravity simulation. Build systems, cause chaos, watch the figure-8." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='6' fill='%23ffd166'/><circle cx='27' cy='9' r='3' fill='%2338bdf8'/></svg>" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <canvas id="stage"></canvas>
+
+  <header id="topbar">
+    <div id="logo" class="logo">
+      <span class="dot d1" style="background:#ffd166;color:#ffd166"></span><span class="dot d2" style="background:#4ade80;color:#4ade80"></span><span class="dot d3" style="background:#38bdf8;color:#38bdf8"></span>
+      <span class="word">Claudo</span>
+    </div>
+    <div class="actions">
+      <select id="presetSelect" title="Load a system"><option value="" disabled selected>Systems…</option></select>
+      <button id="playBtn" class="btn">❚❚ Pause</button>
+      <button id="randomBtn" class="btn" title="Random gravitational cluster">⚄ Cluster</button>
+      <button id="clearBtn" class="btn ghost" title="Remove all bodies">⌫ Clear</button>
+      <button id="panelToggle" class="btn ghost only-narrow" title="Toggle controls">⚙</button>
+    </div>
+  </header>
+
+  <aside id="panel">
+    <button class="panel-close only-narrow" onclick="document.body.classList.remove('panel-open')">✕</button>
+    <section class="group">
+      <h3>Gravity</h3>
+      <p class="tip"><b>Drag on space</b> to fling a new body — the drag direction and length set its velocity. Everything attracts everything.</p>
+      <label class="ctl"><span>Strength G</span><input id="gRange" type="range" min="0.1" max="4" step="0.05" value="1" /><output id="gVal">1.00</output></label>
+      <label class="ctl"><span>New mass</span><input id="massRange" type="range" min="1" max="200" step="1" value="8" /><output id="massVal">8</output></label>
+      <label class="ctl"><span>Speed</span><input id="speedRange" type="range" min="0.1" max="3" step="0.1" value="1" /><output id="speedVal">1.0</output></label>
+      <label class="ctl"><span>Trails</span><input id="trailsRange" type="range" min="0" max="0.98" step="0.02" value="0.9" /><output id="trailsVal">0.90</output></label>
+      <label class="ctl checkbox"><span>Merge on collide</span><input id="mergeChk" type="checkbox" checked /><output></output></label>
+    </section>
+    <footer class="panel-foot">
+      <span><b id="countVal">0</b> bodies</span>
+      <a href="https://en.wikipedia.org/wiki/Three-body_problem" target="_blank" rel="noopener">three-body problem</a>
+    </footer>
+  </aside>
+
+  <div id="hint">
+    <div class="hint-inner">
+      <strong>Build a universe.</strong>
+      Every body pulls on every other by Newtonian gravity, integrated the way real orbital simulators do it.
+      <span>Drag on empty space to fling a planet · Try the systems menu · Watch the figure-8.</span>
+    </div>
+  </div>
+  <div id="toast"></div>
+  <script type="module" src="js/orbits.js"></script>
+</body>
+</html>

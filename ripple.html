@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Claudo · Ripple — a 2-D wave interference tank</title>
+  <meta name="description" content="A finite-difference wave-equation simulator. Drop ripples, place oscillating sources, and paint reflecting walls to see real interference and diffraction — including the double-slit experiment." />
+  <meta name="theme-color" content="#07070c" />
+  <meta property="og:title" content="Claudo · Ripple" />
+  <meta property="og:description" content="A real wave-equation tank in your browser — build the double-slit experiment and watch interference emerge." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='5' fill='none' stroke='%2338bdf8' stroke-width='2'/><circle cx='16' cy='16' r='10' fill='none' stroke='%232dd4bf' stroke-width='2'/></svg>" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <canvas id="stage"></canvas>
+
+  <header id="topbar">
+    <div id="logo" class="logo">
+      <span class="dot d1" style="background:#38bdf8;color:#38bdf8"></span><span class="dot d2" style="background:#2dd4bf;color:#2dd4bf"></span><span class="dot d3" style="background:#7dd3fc;color:#7dd3fc"></span>
+      <span class="word">Claudo</span>
+    </div>
+    <div class="actions">
+      <select id="presetSelect" title="Load a setup"><option value="" disabled selected>Experiments…</option></select>
+      <button id="playBtn" class="btn">❚❚ Pause</button>
+      <button id="clearBtn" class="btn ghost" title="Calm the water (keep walls)">≈ Calm</button>
+      <button id="resetBtn" class="btn ghost" title="Clear everything">⌫ Reset</button>
+      <button id="panelToggle" class="btn ghost only-narrow" title="Toggle controls">⚙</button>
+    </div>
+  </header>
+
+  <aside id="panel">
+    <button class="panel-close only-narrow" onclick="document.body.classList.remove('panel-open')">✕</button>
+    <section class="group">
+      <h3>Tool</h3>
+      <p class="tip">Pick a tool, then act on the tank. Edges absorb waves, so patterns stay clean.</p>
+      <div class="mode-row">
+        <button class="mode-btn active" data-mode="drop">💧 Drop</button>
+        <button class="mode-btn" data-mode="source">◉ Source</button>
+        <button class="mode-btn" data-mode="wall">▧ Wall</button>
+        <button class="mode-btn" data-mode="erase">⌫ Erase</button>
+      </div>
+    </section>
+    <section class="group">
+      <h3>Wave</h3>
+      <label class="ctl"><span>Frequency</span><input id="freqRange" type="range" min="0.06" max="0.5" step="0.01" value="0.22" /><output id="freqVal">0.22</output></label>
+      <label class="ctl"><span>Speed</span><input id="speedRange" type="range" min="0.2" max="0.7" step="0.02" value="0.5" /><output id="speedVal">0.50</output></label>
+      <label class="ctl"><span>Damping</span><input id="dampRange" type="range" min="0" max="0.01" step="0.0005" value="0.0015" /><output id="dampVal">0.0015</output></label>
+      <label class="ctl"><span>Palette</span><select id="paletteSelect" class="inline-select"></select><output></output></label>
+    </section>
+    <footer class="panel-foot">
+      <span>wave equation · leapfrog</span>
+      <a href="https://en.wikipedia.org/wiki/Double-slit_experiment" target="_blank" rel="noopener">double-slit</a>
+    </footer>
+  </aside>
+
+  <div id="hint">
+    <div class="hint-inner">
+      <strong>Waves, for real.</strong>
+      This solves the wave equation on a grid — so the interference fringes and diffraction you see are the genuine physics, not a texture.
+      <span>Drop ripples, add sources, paint walls · Load the double-slit and watch the fringes form.</span>
+    </div>
+  </div>
+  <div id="toast"></div>
+  <script type="module" src="js/ripple.js"></script>
+</body>
+</html>

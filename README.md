@@ -41,6 +41,26 @@ direction. Weave through spinning blades, sweep up glowing orbs, and stack your
 combo. Screen shake, particles, sound, and a local high score. One input, endless
 panic.
 
+### 🔴🟠🟡 Fusion — *ignite a tokamak plasma*
+A physically real 0-D tokamak burn simulator — not a mock-up. It integrates the
+plasma power balance with **Bosch–Hale D-T reactivity**, alpha self-heating,
+bremsstrahlung and transport losses, plus a Troyon-style β limit. Tune density,
+heating, confinement and field until the alpha heating overtakes the losses and
+the burn runs away to ignition — then cut the external heating and watch it stay
+lit (Q → ∞). Live temperature, fusion power, gain, and the Lawson triple product.
+
+### 🟡🟢🔵 Orbits — *an N-body gravity sandbox*
+A real gravity simulator using velocity-Verlet integration and merging
+collisions. **Drag on empty space** to fling a new body; everything attracts
+everything. Build solar systems, cause three-body chaos, or run the famous
+figure-8 choreography.
+
+### 🔵🟦🟣 Ripple — *a 2-D wave interference tank*
+A finite-difference wave-equation solver with an absorbing border, so the
+interference and diffraction you see are genuine physics. Drop ripples, place
+oscillating sources, paint reflecting walls — and load the **double-slit** preset
+to watch the fringes form.
+
 The generative pages let you **randomize**, load **presets**, **share** the exact
 state via a compact URL, and **save a PNG**.
 
@@ -104,7 +124,13 @@ js/attractor.js      strange-attractor accumulator + rendering
 js/reaction.js       Gray-Scott reaction-diffusion engine
 js/pulse.js          Web Audio sequencer + look-ahead scheduler
 js/pivot.js          the Pivot arcade game
+js/fusion.js         0-D tokamak burn model (Bosch–Hale reactivity)
+js/orbits.js         N-body gravity (velocity-Verlet)
+js/ripple.js         2-D wave-equation solver
 ```
+
+Pages: `index.html`, `attractor.html`, `reaction.html`, `pulse.html`,
+`pivot.html`, `fusion.html`, `orbits.html`, `ripple.html`.
 
 ## Credits
 
