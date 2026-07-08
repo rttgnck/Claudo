@@ -6,7 +6,7 @@ import { Orbit3D, loadThree } from './orbit3d.js';
 const GAP = 1.25;
 
 export class Pulse3D {
-  constructor() { this.ready = false; this.maxRows = 44; this.maxSteps = 32; }
+  constructor() { this.ready = false; this.maxRows = 52; this.maxSteps = 128; }
 
   async init() {
     const THREE = this.THREE = await loadThree();
