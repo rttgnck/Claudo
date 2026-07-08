@@ -9,8 +9,10 @@
 // confinement until you get there, then pull the external heating to zero and see
 // if it stays lit.
 import { initNav } from './nav.js';
+import { Fusion3D } from './fusion3d.js';
 
 const $ = (id) => document.getElementById(id);
+let mode3d = false, f3d = null;
 const canvas = $('stage');
 const ctx = canvas.getContext('2d');
 const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -255,8 +257,23 @@ function frame(now) {
     spawnFlashes(dt);
     updateReadouts();
   }
-  render();
+  if (mode3d) { if (f3d && f3d.ready) { f3d.update(state.T, out.Pfus || 0, dt); f3d.render(dt); } }
+  else render();
   requestAnimationFrame(frame);
+}
+
+async function toggle3D() {
+  const btn = $('mode3dBtn');
+  if (!mode3d) {
+    if (!f3d) { f3d = new Fusion3D(); await f3d.init(); }
+    mode3d = true; document.body.classList.add('mode-3d');
+    btn.textContent = '◱ 2D'; btn.classList.add('active');
+    f3d.activate();
+  } else {
+    mode3d = false; document.body.classList.remove('mode-3d');
+    btn.textContent = '⬗ 3D'; btn.classList.remove('active');
+    if (f3d) f3d.deactivate();
+  }
 }
 
 // ---- controls -----------------------------------------------------------
@@ -288,6 +305,7 @@ function bindButtons() {
     syncControls();
   });
   $('coldBtn').addEventListener('click', () => { state.T = 0.5; });
+  $('mode3dBtn').addEventListener('click', () => toggle3D());
   $('shareBtn').addEventListener('click', async () => {
     const code = encode();
     const url = `${location.origin}${location.pathname}#${code}`;
