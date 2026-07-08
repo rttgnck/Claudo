@@ -4,6 +4,9 @@ import { Renderer } from './renderer.js';
 import { MatrixEditor } from './ui.js';
 import { PRESETS } from './presets.js';
 import { encodeState, decodeState } from './share.js';
+import { ParticleLife3D } from './particlelife3d.js';
+
+let mode3d = false, p3d = null;
 
 const $ = (id) => document.getElementById(id);
 const canvas = $('stage');
@@ -50,7 +53,7 @@ function applyState(st) {
 // ---- controls -----------------------------------------------------------
 const controls = [
   ['countRange', 'countVal', (v) => sim.setCount(v | 0), () => sim.count, (v) => v | 0],
-  ['colorsRange', 'colorsVal', (v) => { sim.setColors(v | 0); editor.refresh(); }, () => sim.numColors, (v) => v | 0],
+  ['colorsRange', 'colorsVal', (v) => { sim.setColors(v | 0); editor.refresh(); syncRules3D(); }, () => sim.numColors, (v) => v | 0],
   ['rmaxRange', 'rmaxVal', (v) => { sim.rMax = v; sim._allocate(); }, () => sim.rMax, (v) => v.toFixed(3)],
   ['betaRange', 'betaVal', (v) => sim.beta = v, () => sim.beta, (v) => v.toFixed(2)],
   ['forceRange', 'forceVal', (v) => sim.forceFactor = v, () => sim.forceFactor, (v) => v.toFixed(1)],
@@ -97,6 +100,7 @@ function buildPresets() {
     sim.randomizePositions();
     editor.refresh();
     syncControls();
+    syncRules3D(); if (p3d) p3d.scatter();
   });
 }
 
@@ -163,9 +167,11 @@ function bindButtons() {
     sim.randomizePositions();
     editor.refresh();
     $('presetSelect').value = '';
+    syncRules3D(); if (p3d) p3d.scatter();
     flashLogo();
   });
-  $('restartBtn').addEventListener('click', () => sim.randomizePositions());
+  $('restartBtn').addEventListener('click', () => { sim.randomizePositions(); if (p3d) p3d.scatter(); });
+  $('mode3dBtn').addEventListener('click', () => toggle3D());
 
   $('cursorBtn').addEventListener('click', () => {
     cursorMode *= -1;
@@ -231,10 +237,31 @@ function frame(now) {
     $('fps').textContent = Math.round(1000 / (fpsAcc / fpsN)) + ' fps';
     fpsAcc = 0; fpsN = 0;
   }
-  if (running) sim.step();
-  renderer.render(sim);
+  if (mode3d) {
+    if (p3d && p3d.ready) { if (running) p3d.step(); p3d.render(delta / 1000); }
+  } else {
+    if (running) sim.step();
+    renderer.render(sim);
+  }
   requestAnimationFrame(frame);
 }
+
+async function toggle3D() {
+  const btn = $('mode3dBtn');
+  if (!mode3d) {
+    if (!p3d) { p3d = new ParticleLife3D(); await p3d.init(sim); }
+    p3d.setRules(sim.matrix, sim.numColors);
+    mode3d = true; document.body.classList.add('mode-3d');
+    btn.textContent = '◱ 2D'; btn.classList.add('active');
+    p3d.activate();
+  } else {
+    mode3d = false; document.body.classList.remove('mode-3d');
+    btn.textContent = '⬗ 3D'; btn.classList.remove('active');
+    if (p3d) p3d.deactivate();
+  }
+}
+// Keep the 3D rules in sync when colours/matrix change wholesale.
+function syncRules3D() { if (p3d) p3d.setRules(sim.matrix, sim.numColors); }
 
 // ---- boot ---------------------------------------------------------------
 const editor = new MatrixEditor($('matrix'), sim, () => {

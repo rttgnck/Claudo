@@ -4,8 +4,10 @@
 // "Turing patterns" that paint seashells and animal coats. Paint with the
 // cursor to inject chemical B and watch it spread.
 import { initNav } from './nav.js';
+import { Reaction3D } from './reaction3d.js';
 
 const $ = (id) => document.getElementById(id);
+let mode3d = false, r3d = null;
 const canvas = $('stage');
 const ctx = canvas.getContext('2d', { alpha: false });
 const grid = document.createElement('canvas');
@@ -152,12 +154,15 @@ function applyPointer() {
   splash(gx, gy, Math.max(4, gh * 0.03) / view.z);
 }
 
-function loop() {
+let lastT = performance.now();
+function loop(now) {
+  const dt = Math.min((now - lastT) / 1000, 0.05); lastT = now;
   if (running) {
     applyPointer();
     for (let s = 0; s < state.speed; s++) step();
   }
-  paint();
+  if (mode3d) { if (r3d && r3d.ready) { r3d.update(B, gw, gh); r3d.render(dt); } }
+  else paint();
   requestAnimationFrame(loop);
 }
 
@@ -172,7 +177,7 @@ function bindControls() {
   $('feedRange').addEventListener('input', () => { state.f = parseFloat($('feedRange').value); $('feedVal').textContent = state.f.toFixed(4); $('presetSelect').value = ''; });
   $('killRange').addEventListener('input', () => { state.k = parseFloat($('killRange').value); $('killVal').textContent = state.k.toFixed(4); $('presetSelect').value = ''; });
   $('speedRange').addEventListener('input', () => { state.speed = parseInt($('speedRange').value); $('speedVal').textContent = state.speed; });
-  $('paletteSelect').addEventListener('change', () => { state.palette = $('paletteSelect').value; });
+  $('paletteSelect').addEventListener('change', () => { state.palette = $('paletteSelect').value; if (r3d) r3d.setPaletteLUT(PALETTES[state.palette]); });
 }
 
 // ---- pointer paint ------------------------------------------------------
@@ -233,6 +238,21 @@ function decode(str) {
 }
 
 // ---- buttons ------------------------------------------------------------
+async function toggle3D() {
+  const btn = $('mode3dBtn');
+  if (!mode3d) {
+    if (!r3d) { r3d = new Reaction3D(); await r3d.init(gw, gh); }
+    r3d.setPaletteLUT(PALETTES[state.palette]);
+    mode3d = true; document.body.classList.add('mode-3d');
+    btn.textContent = '◱ 2D'; btn.classList.add('active');
+    r3d.activate();
+  } else {
+    mode3d = false; document.body.classList.remove('mode-3d');
+    btn.textContent = '⬗ 3D'; btn.classList.remove('active');
+    if (r3d) r3d.deactivate();
+  }
+}
+
 function bindButtons() {
   $('playBtn').addEventListener('click', () => {
     running = !running;
@@ -260,6 +280,7 @@ function bindButtons() {
     a.href = canvas.toDataURL('image/png');
     a.click();
   });
+  $('mode3dBtn').addEventListener('click', () => toggle3D());
   $('panelToggle').addEventListener('click', () => document.body.classList.toggle('panel-open'));
 }
 

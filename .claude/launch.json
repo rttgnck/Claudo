@@ -4,7 +4,7 @@
     {
       "name": "claudo",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "4177"],
+      "runtimeArgs": [".claude/serve.py", "4177"],
       "port": 4177
     }
   ]
