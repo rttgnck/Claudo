@@ -4,8 +4,10 @@
 // orbits stay crisp instead of spiralling from numerical drift. Drag to fling a
 // new world and watch the choreography.
 import { initNav } from './nav.js';
+import { Orbits3D } from './orbits3d.js';
 
 const $ = (id) => document.getElementById(id);
+let mode3d = false, o3d = null;
 const canvas = $('stage');
 const ctx = canvas.getContext('2d');
 const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -206,13 +208,32 @@ function hexA(hex, a) { const n = parseInt(hex.slice(1), 16); return `rgba(${(n 
 let last = performance.now();
 function frame(now) {
   let dt = (now - last) / 1000; last = now; if (dt > 0.05) dt = 0.05;
-  if (state.running) {
-    const steps = 4;
-    const h = dt * state.speed * 1.6 / steps;
-    for (let i = 0; i < steps; i++) integrate(h);
+  if (mode3d) {
+    if (o3d && o3d.ready) { if (state.running) o3d.step(dt * state.speed * 1.6, state.merge); o3d.render(dt); $('countVal').textContent = o3d.count; }
+  } else {
+    if (state.running) {
+      const steps = 4;
+      const h = dt * state.speed * 1.6 / steps;
+      for (let i = 0; i < steps; i++) integrate(h);
+    }
+    render();
   }
-  render();
   requestAnimationFrame(frame);
+}
+
+async function toggle3D() {
+  const btn = $('mode3dBtn');
+  if (!mode3d) {
+    if (!o3d) { o3d = new Orbits3D(); await o3d.init(state.G); }
+    o3d.G = state.G;
+    mode3d = true; document.body.classList.add('mode-3d');
+    btn.textContent = '◱ 2D'; btn.classList.add('active');
+    o3d.activate();
+  } else {
+    mode3d = false; document.body.classList.remove('mode-3d');
+    btn.textContent = '⬗ 3D'; btn.classList.remove('active');
+    if (o3d) o3d.deactivate();
+  }
 }
 
 // ---- controls -----------------------------------------------------------
@@ -224,7 +245,7 @@ function syncControls() {
   $('mergeChk').checked = state.merge;
 }
 function bindControls() {
-  $('gRange').addEventListener('input', () => { state.G = parseFloat($('gRange').value); $('gVal').textContent = state.G.toFixed(2); });
+  $('gRange').addEventListener('input', () => { state.G = parseFloat($('gRange').value); $('gVal').textContent = state.G.toFixed(2); if (o3d) o3d.G = state.G; });
   $('massRange').addEventListener('input', () => { state.newMass = parseFloat($('massRange').value); $('massVal').textContent = state.newMass.toFixed(0); });
   $('trailsRange').addEventListener('input', () => { state.trails = parseFloat($('trailsRange').value); $('trailsVal').textContent = state.trails.toFixed(2); });
   $('speedRange').addEventListener('input', () => { state.speed = parseFloat($('speedRange').value); $('speedVal').textContent = state.speed.toFixed(1); });
@@ -232,12 +253,13 @@ function bindControls() {
 }
 function bindButtons() {
   $('playBtn').addEventListener('click', () => { state.running = !state.running; $('playBtn').textContent = state.running ? '❚❚ Pause' : '▶ Play'; $('playBtn').classList.toggle('paused', !state.running); });
-  $('clearBtn').addEventListener('click', () => { bodies = []; clearCanvas(); });
-  $('randomBtn').addEventListener('click', () => loadPreset('Cluster'));
+  $('clearBtn').addEventListener('click', () => { if (mode3d && o3d) o3d.clear(); else { bodies = []; clearCanvas(); } });
+  $('randomBtn').addEventListener('click', () => { if (mode3d && o3d) o3d.loadPreset('Cluster'); else loadPreset('Cluster'); });
+  $('mode3dBtn').addEventListener('click', () => toggle3D());
   $('panelToggle').addEventListener('click', () => document.body.classList.toggle('panel-open'));
   const ps = $('presetSelect');
   Object.keys(PRESETS).forEach((n) => { const o = document.createElement('option'); o.value = n; o.textContent = n; ps.appendChild(o); });
-  ps.addEventListener('change', () => { if (ps.value) loadPreset(ps.value); });
+  ps.addEventListener('change', () => { if (!ps.value) return; if (mode3d && o3d) o3d.loadPreset(ps.value); else loadPreset(ps.value); });
 }
 
 // ---- boot ---------------------------------------------------------------
