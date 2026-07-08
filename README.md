@@ -30,13 +30,18 @@ paints seashells and animal coats. Drag on the canvas to inject chemical and
 watch it spread.
 
 ### 🩷🔵🟡 Pulse — *a browser groovebox*
-A full Web Audio music tool. An **8-voice synthesized drum kit** plus **Bass and
-Lead subtractive synths** (waveform, filter, ADSR, glide), a **per-track mixer**
-(mute/solo/volume/pan), and scale-locked note grids across 11 scales so anything
-you tap stays in key. **Master FX** — drive, filter, reverb, tempo-synced delay.
-An **8-slot pattern bank**, genre presets, tap tempo, swing, 16/32 steps, a
-metronome, and an output scope. **Export your loop to WAV**, share it by URL,
-save/load projects, and play the lead live with your computer keyboard.
+A deep Web Audio music tool. An **11-voice synth drum kit** with switchable
+flavors (**808 / 909 / LoFi / Acoustic**), plus **Bass, Lead and Chord synths**
+with **five engines** (subtractive / FM / supersaw / pluck / organ), filter,
+ADSR, glide and gate. A **style-aware beat generator** (House, Techno, Trap, DnB,
+Breakbeat, Funk, Lo-fi, Latin, Pop, Ambient) writes coherent drums + bass +
+chords + lead in key — then **Mutate**, per-track **dice**, and **Humanize** to
+taste. **Variable pattern length** (up to 8 bars) with scrolling and an
+auto-following playhead, **per-step ratchets & velocity**, **per-track
+probability**, a **pattern bank + Song mode** to arrange a track, **master FX**
+(drive/filter/reverb/tempo-delay/limiter), **undo**, an output **scope /
+spectrum**, a live computer keyboard, and **WAV + MIDI export** plus URL sharing
+and save/load.
 
 ### 🟢🩷🟣 Pivot — *a one-tap reflex arcade*
 A game. You orbit a sun on a ring; **tap, click, or press space** to reverse
