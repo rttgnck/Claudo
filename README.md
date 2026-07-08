@@ -29,11 +29,14 @@ self-organizing into coral, spots, mazes, and dividing cells — the same math t
 paints seashells and animal coats. Drag on the canvas to inject chemical and
 watch it spread.
 
-### 🩷🔵🟡 Pulse — *a step sequencer you can play*
-A Web Audio drum machine and melody sequencer. Four synthesized drum voices plus
-an 8-note melody lane that's **locked to a musical scale**, so every beat you tap
-out (or randomize) lands in key. Tempo, swing, presets, and a look-ahead
-scheduler for rock-solid timing. Hit space to play; share your loop by URL.
+### 🩷🔵🟡 Pulse — *a browser groovebox*
+A full Web Audio music tool. An **8-voice synthesized drum kit** plus **Bass and
+Lead subtractive synths** (waveform, filter, ADSR, glide), a **per-track mixer**
+(mute/solo/volume/pan), and scale-locked note grids across 11 scales so anything
+you tap stays in key. **Master FX** — drive, filter, reverb, tempo-synced delay.
+An **8-slot pattern bank**, genre presets, tap tempo, swing, 16/32 steps, a
+metronome, and an output scope. **Export your loop to WAV**, share it by URL,
+save/load projects, and play the lead live with your computer keyboard.
 
 ### 🟢🩷🟣 Pivot — *a one-tap reflex arcade*
 A game. You orbit a sun on a ring; **tap, click, or press space** to reverse
@@ -130,7 +133,9 @@ js/presets.js        curated universes
 js/share.js          pack/unpack a universe into a URL
 js/attractor.js      strange-attractor accumulator + rendering
 js/reaction.js       Gray-Scott reaction-diffusion engine
-js/pulse.js          Web Audio sequencer + look-ahead scheduler
+js/pulse.js          groovebox app (UI, transport, patterns, share, export)
+js/pulse-audio.js    audio engine: synthesis, FX graph, scheduler, WAV bounce
+js/pulse-defs.js     track roster + scales
 js/pivot.js          the Pivot arcade game
 js/fusion.js         0-D tokamak burn model (Bosch–Hale reactivity)
 js/orbits.js         N-body gravity (velocity-Verlet)
