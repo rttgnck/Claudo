@@ -3,8 +3,10 @@
 // tap out (or randomize) lands in key and sounds musical. A look-ahead
 // scheduler keeps timing rock-solid independent of the render loop.
 import { initNav } from './nav.js';
+import { Pulse3D } from './pulse3d.js';
 
 const $ = (id) => document.getElementById(id);
+let mode3d = false, p3d = null;
 const STEPS = 16;
 
 // ---- musical setup ------------------------------------------------------
@@ -234,13 +236,30 @@ function highlight(col) {
   if (col >= 0) colEls[col].forEach((c) => c.classList.add('playhead'));
   lastCol = col;
 }
-function draw() {
+let last3 = performance.now();
+function draw(now) {
+  const dt = Math.min((now - last3) / 1000, 0.05); last3 = now;
   if (playing && ctx) {
     while (drawQueue.length && drawQueue[0].t <= ctx.currentTime) {
       highlight(drawQueue.shift().step);
     }
   }
+  if (mode3d && p3d && p3d.ready) p3d.update(state.drums, state.melody, playing ? lastCol : -1), p3d.render(dt);
   requestAnimationFrame(draw);
+}
+
+async function toggle3D() {
+  const btn = $('mode3dBtn');
+  if (!mode3d) {
+    if (!p3d) { p3d = new Pulse3D(); await p3d.init(); }
+    mode3d = true; document.body.classList.add('mode-3d');
+    btn.textContent = '◱ 2D'; btn.classList.add('active');
+    p3d.activate();
+  } else {
+    mode3d = false; document.body.classList.remove('mode-3d');
+    btn.textContent = '⬗ 3D'; btn.classList.remove('active');
+    if (p3d) p3d.deactivate();
+  }
 }
 
 // ---- pattern generation -------------------------------------------------
@@ -345,6 +364,7 @@ function bindButtons() {
     history.replaceState(null, '', `#${code}`);
     try { await navigator.clipboard.writeText(url); toast('Pattern link copied'); } catch { toast('Link set in address bar'); }
   });
+  $('mode3dBtn').addEventListener('click', () => toggle3D());
   $('panelToggle').addEventListener('click', () => document.body.classList.toggle('panel-open'));
   document.addEventListener('keydown', (e) => { if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') { e.preventDefault(); playing ? stop() : play(); } });
 }

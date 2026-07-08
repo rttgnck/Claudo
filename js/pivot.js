@@ -244,6 +244,11 @@ $('muteBtn').addEventListener('click', () => {
   muted = !muted;
   $('muteBtn').textContent = muted ? '🔇' : '🔊';
 });
+$('mode3dBtn').addEventListener('click', () => {
+  const on = document.body.classList.toggle('pivot3d');
+  $('mode3dBtn').textContent = on ? '◱ 2D' : '⬗ 3D';
+  $('mode3dBtn').classList.toggle('active', on);
+});
 $('shareBtn').addEventListener('click', async () => {
   const text = `I scored ${score} in Pivot 🌀 — a one-tap reflex game.`;
   const url = `${location.origin}${location.pathname}`;

@@ -512,9 +512,14 @@ body.playing .hud { display: flex; }
 }
 .three-canvas:active { cursor: grabbing; }
 body.mode-3d #stage { display: none; }
+body.mode-3d .stage-center { display: none; }
 body.mode-3d #params2d { display: none; }
 body.mode-3d .mode3d-only { display: block !important; }
 .btn.active { background: linear-gradient(135deg, var(--accent-2), #818cf8); border-color: transparent; color: #04121a; font-weight: 700; }
+
+/* Pivot: perspective-tilt "3D" orbit view (the game is angular / 2.5D). */
+body.pivot3d #stage { transform: perspective(1200px) rotateX(52deg); transform-origin: 50% 54%; transition: transform 0.5s ease; }
+#stage { transition: transform 0.5s ease; }
 
 /* ---- mode toggle (Ripple) ---- */
 .mode-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
