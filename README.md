@@ -64,6 +64,14 @@ to watch the fringes form.
 The generative pages let you **randomize**, load **presets**, **share** the exact
 state via a compact URL, and **save a PNG**.
 
+### Every page: zoom + a 3D mode
+- **Zoom** — scroll (or pinch) to zoom, anywhere.
+- **3D** — hit the **⬗ 3D** button to flip into three dimensions (drag to orbit,
+  scroll to zoom). Attractors become Lorenz/Aizawa/Thomas point clouds; Ripple &
+  Reaction become lit relief surfaces; Particle Life & Orbits run true 3D physics;
+  Fusion becomes a glowing torus; Pulse becomes a field of riser bars. Powered by
+  [Three.js](https://threejs.org) (loaded on demand, only when you enter 3D).
+
 ---
 
 ## What you can do
